@@ -11,7 +11,7 @@ A python script to test code for improperly repeated lines.
     difference must be to trigger a positive result.
 
 
-Here's some of the output from the test file found (<a href="http://www.viva64.com/en/b/0260/print/">source</a>):
+Here's some of the output from the test file (found <a href="http://www.viva64.com/en/b/0260/print/">here</a>):
 
 
     ...
