@@ -1,0 +1,333 @@
+
+<html>
+	<head>
+		<title>The Last Line Effect</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="description" content="">
+		<meta name="keywords" content="">		
+
+		<link rel="stylesheet" type="text/css" href="/media/css/print_styles.css"/>
+		<link rel="stylesheet" href="/media/css/page.css" type="text/css"  media="screen, projection"/>
+		<link rel="shortcut icon" href="/media/images/template/favicon.ico"/>
+	</head>
+	<body>	
+		<div id="content">
+			<div>
+				<h1>
+	The Last Line Effect
+</h1>
+			</div>
+			<div>
+				
+    <script src="/media/js/run_prettify.js"></script>
+	
+
+
+
+<ul class="content-list-1">
+<li><a href="#ID0EIBAC">Introduction</a></li>
+<li><a href="#ID0EQHAE">Last line effect</a></li>
+<li><a href="#ID0EYQBG">Examples</a><ul class="content-list-2">
+<li><a href="#ID0EPYBG">Source Engine SDK</a></li>
+<li><a href="#ID0EJNAI">Chromium</a></li>
+<li><a href="#ID0EJ6AI">ReactOS</a></li>
+<li><a href="#ID0E6EBI">Multi Theft Auto</a></li>
+<li><a href="#ID0EOFCI">Source Engine SDK</a></li>
+<li><a href="#ID0EC3CI">Trans-Proteomic Pipeline</a></li>
+<li><a href="#ID0EBAAK">SeqAn</a></li>
+<li><a href="#ID0EZIAK">SlimDX</a></li>
+<li><a href="#ID0EOABK">Qt</a></li>
+<li><a href="#ID0EVACK">ReactOS</a></li>
+<li><a href="#ID0EK3CK">Mozilla Firefox</a></li>
+<li><a href="#ID0E2ODK">Quake-III-Arena</a></li>
+<li><a href="#ID0EJ1DK">Clang</a></li>
+<li><a href="#ID0E3REK">MongoDB</a></li>
+<li><a href="#ID0EMJFK">Unreal Engine 4</a></li>
+<li><a href="#ID0EU6FK">Qt</a></li>
+<li><a href="#ID0EG5GK">OpenSSL</a></li>
+</ul>
+</li>
+<li><a href="#ID0ETTHK">Conclusion</a></li>
+</ul>
+<p>I have studied numbers of errors caused by using the Copy-Paste method and can assure you that programmers most often tend to make mistakes in the last fragment of a homogeneous code block. I have never seen this phenomenon described in books on programming, so I decided to write about it myself. I called it the "last line effect".</p>
+<div class="div-image"><img src="/media/images/content/b/0260_LastLine/image1.png" alt="Picture 2" /></div>
+<h2>Introduction<a name="ID0EIBAC"></a></h2>
+<p>My name is Andrey Karpov and I do an unusual job - I analyze program code of various applications with the help of static analyzers and write descriptions of errors and defects I find. I do this for pragmatic and mercenary reasons because what I do is the way our company advertises its tools PVS-Studio and CppCat. The scheme is very simple. I find bugs. Then I describe them in an article. The article attracts our potential customers' attention. Profit. But today's article is not about the analyzers.</p>
+<p>When carrying out analysis of various projects, I save bugs I find and the corresponding code fragments in a special database. By the way, anyone interested can take a look at this database. We convert it into a collection of html-pages and upload them to our website in the "<a href="/en/examples/" class="link-inner">Detected errors</a>" section.</p>
+<p>This database is unique indeed! It currently contains 1500 code fragments with errors and is waiting for programmers to study it and reveal certain regularity patterns among these errors. That may serve as a useful basis for many future researches, manuals and articles.</p>
+<p>I have never carried out any special investigation of the material gathered by now. One pattern, however, is showing up so clearly that I decided to investigate it a bit deeper. You see, in my articles I have to write the phrase "note the last line" pretty often. It occurred to me that there had to be some reason behind it.</p>
+<h2>Last line effect<a name="ID0EQHAE"></a></h2>
+<p>When writing program code, programmers often have to write a series of similar constructs. Typing the same code several times is boring and inefficient. That's why they use the Copy-Paste method: a code fragment is copied and pasted several times with further editing. Everyone knows what is bad about this method: you risk easily forgetting to change something in the pasted lines and thus giving birth to errors. Unfortunately, there is often no better alternative to be found.</p>
+<p>Now let's speak of the pattern I discovered. I figured out that mistakes are most often made in the last pasted block of code.</p>
+<p>Here is a simple and short example:</p>
+<pre class="clear"><code>inline Vector3int32&amp; operator+=(const Vector3int32&amp; other) {
+  x += other.x;
+  y += other.y;
+  z += other.y;
+  return *this;
+}</code></pre>
+<p>Note the line "z += other.y;". The programmer forgot to replace 'y' with 'z' in it.</p>
+<p>You may think this is an artificial sample, but it is actually taken from a real application. Further in this article, I am going to convince you that this is a very frequent and common issue. This is what the "last line effect" looks like. Programmers most often make mistakes at the very end of a sequence of similar edits.</p>
+<p>I heard somewhere that mountain-climbers often fall off at the last few dozens of meters of ascent. Not because they are tired; they are simply too joyful about almost reaching the top - they anticipate the sweet taste of victory, get less attentive, and make some fatal mistake. I guess something similar happens to programmers.</p>
+<p>Now a few figures.</p>
+<p>Having studied the bug database, I singled out 84 code fragments that I found to have been written through the Copy-Paste method. Out of them, 41 fragments contain mistakes somewhere in the middle of copied-and-pasted blocks. For example:</p>
+<pre class="clear"><code>strncmp(argv[argidx], "CAT=", 4) &amp;&amp;
+strncmp(argv[argidx], "DECOY=", 6) &amp;&amp;
+strncmp(argv[argidx], "THREADS=", 6) &amp;&amp;
+strncmp(argv[argidx], "MINPROB=", 8)) {</code></pre>
+<p>The length of the "THREADS=" string is 8 characters, not 6.</p>
+<p>In other 43 cases, mistakes were found in the last copied code block.</p>
+<p>Well, the number 43 looks just slightly bigger than 41. But keep in mind that there may be quite a lot of homogeneous blocks, so mistakes can be found in the first, second, fifth, or even tenth block. So we get a relatively smooth distribution of mistakes throughout blocks and a sharp peak at the end.</p>
+<p>I accepted the number of homogeneous blocks to be 5 on the average.</p>
+<p>So it appears that the first 4 blocks contain 41 mistakes distributed throughout them; that makes about 10 mistakes per block.</p>
+<p>And 43 mistakes are left for the fifth block!</p>
+<p>To make it clearer, here is a rough diagram:</p>
+<div class="div-image"><img src="/media/images/content/b/0260_LastLine/image2.png" alt="Figure 1. A rough diagram of mistake distribution in five homogeneous code blocks." /></div>
+<p class="image-note">Figure 1. A rough diagram of mistake distribution in five homogeneous code blocks.</p>
+<p>So what we get is the following pattern:</p>
+<p><span class=" span-b">The probability of making a mistake in the last pasted block of code is 4 times higher than in any other block.</span></p>
+<p>I don't draw any grand conclusions from that. It's just an interesting observation that may be useful to know about for practical reasons - you will stay alert when writing the last fragments of code.</p>
+<h2>Examples<a name="ID0EYQBG"></a></h2>
+<p>Now I only have to convince the readers that it all is not my fancy, but a real tendency. To prove my words, I will show you some examples.</p>
+<p>I won't cite all the examples, of course - only the simplest or most representative ones.</p>
+<h3>Source Engine SDK<a name="ID0EPYBG"></a></h3>
+<pre class="clear"><code>inline void Init( float ix=0, float iy=0,
+                  float iz=0, float iw = 0 ) 
+{
+  SetX( ix );
+  SetY( iy );
+  SetZ( iz );
+  SetZ( iw );
+}</code></pre>
+<p>The SetW() function should be called at the end.</p>
+<h3>Chromium<a name="ID0EJNAI"></a></h3>
+<pre class="clear"><code>if (access &amp; FILE_WRITE_ATTRIBUTES)
+  output.append(ASCIIToUTF16("\tFILE_WRITE_ATTRIBUTES\n"));
+if (access &amp; FILE_WRITE_DATA)
+  output.append(ASCIIToUTF16("\tFILE_WRITE_DATA\n"));
+if (access &amp; FILE_WRITE_EA)
+  output.append(ASCIIToUTF16("\tFILE_WRITE_EA\n"));
+if (access &amp; FILE_WRITE_EA)
+  output.append(ASCIIToUTF16("\tFILE_WRITE_EA\n"));
+break;</code></pre>
+<p>The last block and the one before it are identical.</p>
+<h3>ReactOS<a name="ID0EJ6AI"></a></h3>
+<pre class="clear"><code>if (*ScanString == L'\"' ||
+    *ScanString == L'^' ||
+    *ScanString == L'\"')</code></pre>
+<h3>Multi Theft Auto<a name="ID0E6EBI"></a></h3>
+<pre class="clear"><code>class CWaterPolySAInterface
+{
+public:
+    WORD m_wVertexIDs[3];
+};
+CWaterPoly* CWaterManagerSA::CreateQuad (....)
+{
+  ....
+  pInterface-&gt;m_wVertexIDs [ 0 ] = pV1-&gt;GetID ();
+  pInterface-&gt;m_wVertexIDs [ 1 ] = pV2-&gt;GetID ();
+  pInterface-&gt;m_wVertexIDs [ 2 ] = pV3-&gt;GetID ();
+  pInterface-&gt;m_wVertexIDs [ 3 ] = pV4-&gt;GetID ();
+  ....
+}</code></pre>
+<p>The last line was pasted mechanically and is redundant. There are only 3 items in the array.</p>
+<h3>Source Engine SDK<a name="ID0EOFCI"></a></h3>
+<pre class="clear"><code>intens.x=OrSIMD(AndSIMD(BackgroundColor.x,no_hit_mask),
+                AndNotSIMD(no_hit_mask,intens.x));
+intens.y=OrSIMD(AndSIMD(BackgroundColor.y,no_hit_mask),
+                AndNotSIMD(no_hit_mask,intens.y));
+intens.z=OrSIMD(AndSIMD(BackgroundColor.y,no_hit_mask),
+                AndNotSIMD(no_hit_mask,intens.z));</code></pre>
+<p>The programmer forgot to replace "BackgroundColor.y" with "BackgroundColor.z" in the last block. </p>
+<h3>Trans-Proteomic Pipeline<a name="ID0EC3CI"></a></h3>
+<pre class="clear"><code>void setPepMaxProb(....)
+{  
+  ....
+  double max4 = 0.0;
+  double max5 = 0.0;
+  double max6 = 0.0;
+  double max7 = 0.0;
+  ....
+  if ( pep3 ) { ... if ( use_joint_probs &amp;&amp; prob &gt; max3 ) ... }
+  ....
+  if ( pep4 ) { ... if ( use_joint_probs &amp;&amp; prob &gt; max4 ) ... }
+  ....
+  if ( pep5 ) { ... if ( use_joint_probs &amp;&amp; prob &gt; max5 ) ... }
+  ....
+  if ( pep6 ) { ... if ( use_joint_probs &amp;&amp; prob &gt; max6 ) ... }
+  ....
+  if ( pep7 ) { ... if ( use_joint_probs &amp;&amp; prob &gt; max6 ) ... }
+  ....
+}</code></pre>
+<p>The programmer forgot to replace "prob &gt; max6" with "prob &gt; max7" in the last condition.</p>
+<h3>SeqAn<a name="ID0EBAAK"></a></h3>
+<pre class="clear"><code>inline typename Value&lt;Pipe&gt;::Type const &amp; operator*() {
+  tmp.i1 = *in.in1;
+  tmp.i2 = *in.in2;
+  tmp.i3 = *in.in2;
+  return tmp;
+}</code></pre>
+<h3>SlimDX<a name="ID0EZIAK"></a></h3>
+<pre class="clear"><code>for( int i = 0; i &lt; 2; i++ )
+{
+  sliders[i] = joystate.rglSlider[i];
+  asliders[i] = joystate.rglASlider[i];
+  vsliders[i] = joystate.rglVSlider[i];
+  fsliders[i] = joystate.rglVSlider[i];
+}</code></pre>
+<p>The rglFSlider array should have been used in the last line.</p>
+<h3>Qt<a name="ID0EOABK"></a></h3>
+<pre class="clear"><code>if (repetition == QStringLiteral("repeat") ||
+    repetition.isEmpty()) {
+  pattern-&gt;patternRepeatX = true;
+  pattern-&gt;patternRepeatY = true;
+} else if (repetition == QStringLiteral("repeat-x")) {
+  pattern-&gt;patternRepeatX = true;
+} else if (repetition == QStringLiteral("repeat-y")) {
+  pattern-&gt;patternRepeatY = true;
+} else if (repetition == QStringLiteral("no-repeat")) {
+  pattern-&gt;patternRepeatY = false;
+  pattern-&gt;patternRepeatY = false;
+} else {
+  //TODO: exception: SYNTAX_ERR
+}</code></pre>
+<p>'patternRepeatX' is missing in the very last block. The correct code looks as follows:</p>
+<pre class="clear"><code>pattern-&gt;patternRepeatX = false;
+pattern-&gt;patternRepeatY = false;</code></pre>
+<h3>ReactOS<a name="ID0EVACK"></a></h3>
+<pre class="clear"><code>const int istride = sizeof(tmp[0]) / sizeof(tmp[0][0][0]);
+const int jstride = sizeof(tmp[0][0]) / sizeof(tmp[0][0][0]);
+const int mistride = sizeof(mag[0]) / sizeof(mag[0][0]);
+const int mjstride = sizeof(mag[0][0]) / sizeof(mag[0][0]);</code></pre>
+<p>The 'mjstride' variable will always be equal to one. The last line should have been written like this:</p>
+<pre class="clear"><code>const int mjstride = sizeof(mag[0][0]) / sizeof(mag[0][0][0]);</code></pre>
+<h3>Mozilla Firefox<a name="ID0EK3CK"></a></h3>
+<pre class="clear"><code>if (protocol.EqualsIgnoreCase("http") ||
+    protocol.EqualsIgnoreCase("https") ||
+    protocol.EqualsIgnoreCase("news") ||
+    protocol.EqualsIgnoreCase("ftp") ||          &lt;&lt;&lt;---
+    protocol.EqualsIgnoreCase("file") ||
+    protocol.EqualsIgnoreCase("javascript") ||
+    protocol.EqualsIgnoreCase("ftp")) {          &lt;&lt;&lt;---</code></pre>
+<p>A suspicious string "ftp" at the end - it has already been compared to.</p>
+<h3>Quake-III-Arena<a name="ID0E2ODK"></a></h3>
+<pre class="clear"><code>if (fabs(dir[0]) &gt; test-&gt;radius ||
+    fabs(dir[1]) &gt; test-&gt;radius ||
+    fabs(dir[1]) &gt; test-&gt;radius)</code></pre>
+<p>The value from the dir[2] cell is left unchecked.</p>
+<h3>Clang<a name="ID0EJ1DK"></a></h3>
+<pre class="clear"><code>return (ContainerBegLine &lt;= ContaineeBegLine &amp;&amp;
+        ContainerEndLine &gt;= ContaineeEndLine &amp;&amp;
+        (ContainerBegLine != ContaineeBegLine ||
+         SM.getExpansionColumnNumber(ContainerRBeg) &lt;=
+         SM.getExpansionColumnNumber(ContaineeRBeg)) &amp;&amp;
+        (ContainerEndLine != ContaineeEndLine ||
+         SM.getExpansionColumnNumber(ContainerREnd) &gt;=
+         SM.getExpansionColumnNumber(ContainerREnd)));</code></pre>
+<p>At the very end of the block, the "SM.getExpansionColumnNumber(ContainerREnd)" expression is compared to itself.</p>
+<h3>MongoDB<a name="ID0E3REK"></a></h3>
+<pre class="clear"><code>bool operator==(const MemberCfg&amp; r) const {
+  ....
+  return _id==r._id &amp;&amp; votes == r.votes &amp;&amp;
+         h == r.h &amp;&amp; priority == r.priority &amp;&amp;
+         arbiterOnly == r.arbiterOnly &amp;&amp;
+         slaveDelay == r.slaveDelay &amp;&amp;
+         hidden == r.hidden &amp;&amp;
+         buildIndexes == buildIndexes;
+}</code></pre>
+<p>The programmer forgot about "r." in the last line.</p>
+<h3>Unreal Engine 4<a name="ID0EMJFK"></a></h3>
+<pre class="clear"><code>static bool PositionIsInside(....)
+{
+  return
+    Position.X &gt;= Control.Center.X - BoxSize.X * 0.5f &amp;&amp;
+    Position.X &lt;= Control.Center.X + BoxSize.X * 0.5f &amp;&amp;
+    Position.Y &gt;= Control.Center.Y - BoxSize.Y * 0.5f &amp;&amp;
+    Position.Y &gt;= Control.Center.Y - BoxSize.Y * 0.5f;
+}</code></pre>
+<p>The programmer forgot to make 2 edits in the last line. Firstly, "&gt;=" should be replaced with "&lt;=; secondly, minus should be replaced with plus.</p>
+<h3>Qt<a name="ID0EU6FK"></a></h3>
+<pre class="clear"><code>qreal x = ctx-&gt;callData-&gt;args[0].toNumber();
+qreal y = ctx-&gt;callData-&gt;args[1].toNumber();
+qreal w = ctx-&gt;callData-&gt;args[2].toNumber();
+qreal h = ctx-&gt;callData-&gt;args[3].toNumber();
+if (!qIsFinite(x) || !qIsFinite(y) ||
+    !qIsFinite(w) || !qIsFinite(w))</code></pre>
+<p>In the very last call of the function qIsFinite, the 'h' variable should have been used as an argument.</p>
+<h3>OpenSSL<a name="ID0EG5GK"></a></h3>
+<pre class="clear"><code>if (!strncmp(vstart, "ASCII", 5))
+  arg-&gt;format = ASN1_GEN_FORMAT_ASCII;
+else if (!strncmp(vstart, "UTF8", 4))
+  arg-&gt;format = ASN1_GEN_FORMAT_UTF8;
+else if (!strncmp(vstart, "HEX", 3))
+  arg-&gt;format = ASN1_GEN_FORMAT_HEX;
+else if (!strncmp(vstart, "BITLIST", 3))
+  arg-&gt;format = ASN1_GEN_FORMAT_BITLIST;</code></pre>
+<p>The length of the "BITLIST" string is 7, not 3 characters.</p>
+<p>Let's stop here. I hope the examples I have demonstrated are more than enough.</p>
+<h2>Conclusion<a name="ID0ETTHK"></a></h2>
+<p>From this article you have learned that with the Copy-Paste method making a mistake in the last pasted block of code is 4 times more probable than in any other fragment.</p>
+<p>It has to do with the specifics of human psychology, not professional skills. I have shown you in this article that even highly-skilled developers of such projects as Clang or Qt tend to make mistakes of this kind.</p>
+<p>I hope my observation will be useful for programmers and perhaps urge them to investigate our bug database. I believe it will help reveal many regularity patterns among errors and work out new recommendations for programmers.</p>
+
+	
+	
+		
+
+<script>
+$('body').live('keyup', function (e) {
+	var not_meta_key = (!e.altKey && !e.ctrlKey && !e.metaKey )
+	if ( (e.altKey || e.ctrlKey || e.metaKey) && e.which == 37) {
+			e.preventDefault()
+			$(document).trigger('shortcuts.to_prev_page')
+		}
+		if ( (e.altKey || e.ctrlKey || e.metaKey) && e.which == 39) {
+			e.preventDefault()
+			$(document).trigger('shortcuts.to_next_page')
+		}
+}) 	
+$(document).bind('shortcuts.to_prev_page', function(){
+	var url = $('#p_page').attr('href')
+	if(typeof(url) !== 'undefined'){
+		document.location.href = url
+	}
+})
+$(document).bind('shortcuts.to_next_page', function(){
+	var url = $('#n_page').attr('href')
+	if(typeof(url) !== 'undefined'){
+		document.location.href = url
+	}
+}) 		
+
+</script>	
+<div class="next-prev-navigation">	
+	
+	<span class="navigation-next"><a id="n_page" href="
+	
+		/en/b/0261/
+	">
+		Next
+	</a></span>
+	
+	
+	<span class="navigation-prev"><a id="p_page" href="
+			
+		/en/b/0259/
+	">
+		Previous
+	</a></span>	
+		
+</div>
+
+
+
+	
+
+	
+		
+	
+
+			</div>
+		</div>
+	</body>
+</html>
